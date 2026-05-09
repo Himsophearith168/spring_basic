@@ -30,11 +30,12 @@ public class ProductService {
         return productMapper.toProductResponse(product);
     }
 
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public ProductResponse createProduct(Product product) {
+        Product saved = productRepository.save(product);
+        return productMapper.toProductResponse(saved);
     }
 
-    public Product updateProduct(Long id, Product product) {
+    public ProductResponse updateProduct(Long id, Product product) {
         Product check = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
@@ -43,7 +44,8 @@ public class ProductService {
         check.setQuantity(product.getQuantity());
         check.setDescription(product.getDescription());
 
-        return productRepository.save(check);
+        Product updated = productRepository.save(check);
+        return productMapper.toProductResponse(updated);
     }
 
     public void deleteProduct(Long id) {

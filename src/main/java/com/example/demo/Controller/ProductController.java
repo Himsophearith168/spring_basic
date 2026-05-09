@@ -33,11 +33,11 @@ public class ProductController {
     }
 
     @PostMapping
-    ResponseEntity<Product> createProduct(@RequestBody Product product){
+    ResponseEntity<ProductResponse> createProduct(@RequestBody Product product) {
         return ResponseEntity.status(201).body(productService.createProduct(product));
     }
     @PutMapping("/{id}")
-    ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product){
+    ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody Product product){
         return ResponseEntity.ok(productService.updateProduct(id, product));
     }
     @DeleteMapping("/{id}")

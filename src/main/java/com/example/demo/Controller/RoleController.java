@@ -2,14 +2,12 @@ package com.example.demo.Controller;
 
 
 import com.example.demo.Model.Role;
-import com.example.demo.Repository.RoleRepository;
 import com.example.demo.Service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
