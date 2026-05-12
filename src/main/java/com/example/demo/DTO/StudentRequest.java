@@ -14,5 +14,6 @@ public class StudentRequest {
     private Long age;
     private String email;
     private String address;
+    private Double score;
 
 }

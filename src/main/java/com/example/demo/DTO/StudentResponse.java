@@ -1,6 +1,5 @@
 package com.example.demo.DTO;
 
-
 import lombok.*;
 
 @Setter
@@ -14,4 +13,5 @@ public class StudentResponse {
     private Long age;
     private String email;
     private String address;
+    private Double score;
 }
