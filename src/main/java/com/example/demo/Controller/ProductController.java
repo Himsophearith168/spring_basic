@@ -41,8 +41,13 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, product));
     }
     @DeleteMapping("/{id}")
-    ResponseEntity<ProductResponse> deleteProduct(@PathVariable Long id){
+    public ResponseEntity<Map<String,Object>> deleteProduct(@PathVariable Long id){
         productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+        Map<String,Object> res = new HashMap();
+        res.put("Success",true);
+        res.put("Message","Success");
+        res.put("data",null);
+        res.put("status",200);
+        return ResponseEntity.ok(res);
     }
 }
