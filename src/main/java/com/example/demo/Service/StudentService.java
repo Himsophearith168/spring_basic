@@ -2,8 +2,9 @@ package com.example.demo.Service;
 
 import com.example.demo.DTO.StudentRequest;
 import com.example.demo.DTO.StudentResponse;
+import com.example.demo.Exception.ResourceNotFoundException;
 import com.example.demo.Mapper.StudentMapper;
-import com.example.demo.Model.StudentModel;
+import com.example.demo.Model.Student;
 import com.example.demo.Repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,41 +18,42 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
 
-//    Get All Student
-    public List<StudentResponse> findAll(){
+    public List<StudentResponse> findAll() {
         return studentRepository.findAll()
                 .stream()
-                .map(studentMapper::toStudentResponse)
+                .map(studentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-//    Get By ID
-    public StudentResponse findById(Long id){
-        StudentModel student = studentRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
-        return studentMapper.toStudentResponse(student);
+    public StudentResponse findById(Long id) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+        return studentMapper.toResponse(student);
     }
 
-//    Create
-    public StudentResponse createStudent(StudentModel student){
-        StudentModel Student = studentRepository.save(student);
-        return studentMapper.toStudentResponse(Student);
+    public StudentResponse createStudent(StudentRequest request) {
+        Student student = studentMapper.toEntity(request);
+        Student savedStudent = studentRepository.save(student);
+        return studentMapper.toResponse(savedStudent);
     }
 
-//    Update Student
-    public StudentResponse updateStudent(Long id, StudentModel student){
-        StudentModel Student = studentRepository.findById(id).orElseThrow(() -> new RuntimeException("Student not found"));
-        Student.setName(student.getName());
-        Student.setAge(student.getAge());
-        Student.setEmail(student.getEmail());
-        Student.setAddress(student.getAddress());
-        studentRepository.save(Student);
-        return studentMapper.toStudentResponse(Student);
+    public StudentResponse updateStudent(Long id, StudentRequest request) {
+        Student studentExist = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+
+        studentExist.setName(request.name());
+        studentExist.setAge(request.age());
+        studentExist.setEmail(request.email());
+        studentExist.setAddress(request.address());
+        studentExist.setScore(request.score());
+
+        Student updatedStudent = studentRepository.save(studentExist);
+        return studentMapper.toResponse(updatedStudent);
     }
 
-//    Delete Student
-    public void deleteStudent(Long id){
-        var student = studentRepository.findById(id).orElseThrow(() -> new RuntimeException("Student not found"));
-        studentRepository.delete(student);
+    public void deleteStudent(Long id) {
+        Student studentExist = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + id));
+        studentRepository.delete(studentExist);
     }
-
 }

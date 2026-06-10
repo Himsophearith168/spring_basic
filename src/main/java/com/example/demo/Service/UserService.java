@@ -1,6 +1,8 @@
 package com.example.demo.Service;
 
-import com.example.demo.DTO.UserResonse;
+import com.example.demo.DTO.UserRequest;
+import com.example.demo.DTO.UserResponse;
+import com.example.demo.Exception.ResourceNotFoundException;
 import com.example.demo.Mapper.UserMapper;
 import com.example.demo.Model.user;
 import com.example.demo.Repository.UserRepository;
@@ -16,36 +18,41 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public List<UserResonse> findAll(){
+    public List<UserResponse> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(userMapper::touserResponse)
+                .map(userMapper::toResponse)
                 .collect(Collectors.toList());
     }
-    public UserResonse findById(Long id){
-        user user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        return userMapper.touserResponse(user);
+
+    public UserResponse findById(Long id) {
+        user user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        return userMapper.toResponse(user);
     }
 
-    public UserResonse createUser(user user){
-        user data = userRepository.save(user);
-        return userMapper.touserResponse(data);
+    public UserResponse createUser(UserRequest request) {
+        user user = userMapper.toEntity(request);
+        user savedUser = userRepository.save(user);
+        return userMapper.toResponse(savedUser);
     }
 
-    public UserResonse updateUser(Long id,user user){
-        user userExist = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setUsername(user.getUsername());
-        user.setPassword(user.getPassword());
-        user.setEmail(user.getEmail());
-        user.setAddress(user.getAddress());
-        user data = userRepository.save(user);
-        return userMapper.touserResponse(data);
+    public UserResponse updateUser(Long id, UserRequest request) {
+        user userExist = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        
+        userExist.setUsername(request.username());
+        userExist.setPassword(request.password());
+        userExist.setEmail(request.email());
+        userExist.setAddress(request.address());
+        
+        user updatedUser = userRepository.save(userExist);
+        return userMapper.toResponse(updatedUser);
     }
 
-    public UserResonse deleteUser(Long id){
-        user userExist = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    public void deleteUser(Long id) {
+        user userExist = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepository.delete(userExist);
-        return userMapper.touserResponse(userExist);
     }
-
 }

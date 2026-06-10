@@ -10,15 +10,19 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StudentModel {
+public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String name;
-    private Long age;
+
+    private Integer age;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
     private String address;
     private Double score;
 }

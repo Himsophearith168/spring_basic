@@ -1,53 +1,51 @@
 package com.example.demo.Controller;
 
-
+import com.example.demo.Util.ApiResponse;
+import com.example.demo.DTO.ProductRequest;
 import com.example.demo.DTO.ProductResponse;
-import com.example.demo.Model.Product;
 import com.example.demo.Service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+
     @GetMapping
-    ResponseEntity<Map> getProduct(){
-        var product = productService.getAll();
-        Map res = new HashMap();
-        res.put("Total",product.size());
-        res.put("Success",true);
-        res.put("Message","Success");
-        res.put("List",productService.getAll());
-        return ResponseEntity.ok(res);
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts() {
+        List<ProductResponse> products = productService.findAll();
+        return ResponseEntity.ok(ApiResponse.success("Products retrieved successfully", products));
     }
+
     @GetMapping("/{id}")
-    ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.findById(id));
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable Long id) {
+        ProductResponse product = productService.findById(id);
+        return ResponseEntity.ok(ApiResponse.success("Product retrieved successfully", product));
     }
 
     @PostMapping
-    ResponseEntity<ProductResponse> createProduct(@RequestBody Product product) {
-        return ResponseEntity.status(201).body(productService.createProduct(product));
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest request) {
+        ProductResponse data = productService.createProduct(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created("Product created successfully", data));
     }
+
     @PutMapping("/{id}")
-    ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody Product product){
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+        ProductResponse data = productService.updateProduct(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Product updated successfully", data));
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String,Object>> deleteProduct(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        Map<String,Object> res = new HashMap();
-        res.put("Success",true);
-        res.put("Message","Success");
-        res.put("data",null);
-        res.put("status",200);
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(ApiResponse.success("Product deleted successfully", null));
     }
 }

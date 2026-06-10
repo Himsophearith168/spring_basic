@@ -2,29 +2,29 @@ package com.example.demo.Mapper;
 
 import com.example.demo.DTO.StudentRequest;
 import com.example.demo.DTO.StudentResponse;
-import com.example.demo.Model.StudentModel;
+import com.example.demo.Model.Student;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StudentMapper {
-    public StudentModel toStudentRequest(StudentRequest dto){
-        return StudentModel.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .age(dto.getAge())
-                .email(dto.getEmail())
-                .address(dto.getAddress())
-                .score(dto.getScore())
+    public Student toEntity(StudentRequest dto) {
+        return Student.builder()
+                .name(dto.name())
+                .age(dto.age())
+                .email(dto.email())
+                .address(dto.address())
+                .score(dto.score())
                 .build();
     }
-    public StudentResponse toStudentResponse(StudentModel dto){
-        return StudentResponse.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .age(dto.getAge())
-                .email(dto.getEmail())
-                .address(dto.getAddress())
-                .score(dto.getScore())
-                .build();
+
+    public StudentResponse toResponse(Student entity) {
+        return new StudentResponse(
+                entity.getId(),
+                entity.getName(),
+                entity.getAge(),
+                entity.getEmail(),
+                entity.getAddress(),
+                entity.getScore()
+        );
     }
 }

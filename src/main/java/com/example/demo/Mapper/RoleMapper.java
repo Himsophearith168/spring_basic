@@ -7,17 +7,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RoleMapper {
-    public Role toRoleRequest(RoleRequest dto) {
+    public Role toEntity(RoleRequest dto) {
         return Role.builder()
-                .id(dto.getId())
-                .name(dto.getName())
+                .name(dto.name())
+                .description(dto.description())
                 .build();
     }
-    public Role toRoleResponse(Role dto) {
-        return Role.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .build();
+
+    public RoleResponse toResponse(Role entity) {
+        return new RoleResponse(
+                entity.getId(),
+                entity.getName(),
+                entity.getDescription()
+        );
     }
 }

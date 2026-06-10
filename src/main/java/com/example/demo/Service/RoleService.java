@@ -1,16 +1,15 @@
 package com.example.demo.Service;
 
+import com.example.demo.DTO.RoleRequest;
 import com.example.demo.DTO.RoleResponse;
-import com.example.demo.Mapper.ProductMapper;
+import com.example.demo.Exception.ResourceNotFoundException;
 import com.example.demo.Mapper.RoleMapper;
 import com.example.demo.Model.Role;
 import com.example.demo.Repository.RoleRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,33 +17,39 @@ import java.util.stream.Collectors;
 public class RoleService {
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
-    public List<Role> List(){
+
+    public List<RoleResponse> findAll() {
         return roleRepository.findAll().stream()
-                .map(roleMapper::toRoleResponse)
-                .collect(Collectors.toList()).reversed();
+                .map(roleMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Role> findById(Long id){
-        Role role = roleRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Role not found"));
-        return Optional.ofNullable(roleMapper.toRoleResponse(role));
+    public RoleResponse findById(Long id) {
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+        return roleMapper.toResponse(role);
     }
 
-    public Role createRole(Role role){
-        Role newRole = roleRepository.save(role);
-        return roleMapper.toRoleResponse(newRole);
+    public RoleResponse createRole(RoleRequest request) {
+        Role role = roleMapper.toEntity(request);
+        Role savedRole = roleRepository.save(role);
+        return roleMapper.toResponse(savedRole);
     }
 
-    public Role updateRole(Long id,Role role){
+    public RoleResponse updateRole(Long id, RoleRequest request) {
+        Role roleExist = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
 
-        Role isChecked =  roleRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Role not found"));
-        isChecked.setName(role.getName());
-        isChecked.setDescription(role.getDescription());
-        Role updatedRole = roleRepository.save(isChecked);
-        return roleMapper.toRoleResponse(updatedRole);
+        roleExist.setName(request.name());
+        roleExist.setDescription(request.description());
+
+        Role updatedRole = roleRepository.save(roleExist);
+        return roleMapper.toResponse(updatedRole);
     }
 
-    public void deleteRole(Long id){
-        Role ischecked =  roleRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Role not found"));
-        roleRepository.delete(ischecked);
+    public void deleteRole(Long id) {
+        Role roleExist = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+        roleRepository.delete(roleExist);
     }
 }
